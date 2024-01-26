@@ -28,11 +28,16 @@ const Calendar = () => {
 
   const addEvent = () => {
     setRunTimeVisible(!runTimeIsVisible)
+    console.log(runTimeIsVisible)
+
+
   };
 
   useEffect(() => {
     // You can perform any additional logic if needed
   }, [runTimeIsVisible]);
+
+
 
   return (
     // <Text>
@@ -64,6 +69,7 @@ const Calendar = () => {
        
       <AddRunTime
         visible={runTimeIsVisible}
+        onClose={addEvent}
        />
 
 
