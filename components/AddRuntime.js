@@ -2,33 +2,48 @@ import React, { useState, useEffect } from 'react';
 import {  Modal, StyleSheet, Text, Pressable, View, TextInput} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const AddRunTime = ({ visible, onClose }) => {
-  const [startTime, onChangeNumber] = React.useState('');
+const AddRunTime = ({ visible, onSubmit, onCancel, selectedDays, setSelectedDays, startTime, endTime, setStartTime, setEndTime }) => {
+  // const [startTime, onChangeNumber] = React.useState('');
 
-  const [selectedDays, setSelectedDays] = useState([]);
+  // const [selectedDays, setSelectedDays] = useState([]);
   const daysName = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   const dayPressed = (day) => {
     if (selectedDays.includes(day)) {
-      console.log(selectedDays)
       // If selected, remove it from the array
       setSelectedDays(selectedDays.filter(selectedDay => selectedDay !== day));
+
+
     } else {
       // If not selected, add it to the array
       setSelectedDays([...selectedDays, day]);
+
     }
   }
 
 
   //Stuff for TimePicker
-  const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState('date');
-  const [show, setShow] = useState(false);
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate;
-    setShow(false);
-    setDate(currentDate);
+  const onTimeChange = (event, selectedTime, timeType) => {
+    //***TODO***
+    //check to make sure end time is after the start time
+
+
+    const currentTime = selectedTime;
+
+    if (timeType === 'start') {
+      setStartTime(currentTime);
+      const hours = selectedTime.getHours();
+      const minutes = selectedTime.getMinutes();
+      console.log(`Start Time: ${hours}:${minutes}`);
+    } else if (timeType === 'end') {
+      setEndTime(currentTime);
+      const hours = selectedTime.getHours();
+      const minutes = selectedTime.getMinutes();
+      console.log(`End Time: ${hours}:${minutes}`);
+    } else {
+      console.log('ERROR: No Time caught')
+    }
   };
 
   return (
@@ -45,11 +60,11 @@ const AddRunTime = ({ visible, onClose }) => {
               {daysName.map((letter, index) => (
                 <Pressable
                   key={index}
-                  onPress={dayPressed(letter)}
+                  onPress={() => dayPressed(index)}
                   style={({ pressed }) => [
                     styles.button,
                     {
-                      backgroundColor: pressed ? 'lightgray' : 'white',
+                    backgroundColor: selectedDays.includes(index) ? 'lightgray' : 'white',
                     },
                   ]}
                   >
@@ -60,10 +75,10 @@ const AddRunTime = ({ visible, onClose }) => {
             <View style={styles.startTime}>
               <Text>Start Time: </Text>
               <DateTimePicker
-                value={date}
+                value={startTime}
                 mode='time'
                 // display='spinner'
-                onChange={onChange}
+                onChange={(event, selectedTime) => onTimeChange(event, selectedTime, 'start')}
                 style={styles.timePicker}
                 minuteInterval={5}
               />
@@ -72,20 +87,28 @@ const AddRunTime = ({ visible, onClose }) => {
             <View style={styles.endTime}>
               <Text>End Time: </Text>
               <DateTimePicker
-                value={date}
+                value={endTime}
                 mode='time'
                 // display='spinner'
-                onChange={onChange}
+                onChange={(event, selectedTime) => onTimeChange(event, selectedTime, 'end')}
                 style={styles.timePicker}
                 minuteInterval={5}
 
               />
             </View>
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={onClose}>
-              <Text style={styles.textStyle}>Hide Modal</Text>
-            </Pressable>
+            <View style={styles.submitCancel}>
+              <Pressable
+                style={[styles.button, styles.buttonSubmit]}
+                onPress={onSubmit}>
+                <Text style={styles.textStyle}>Set Time</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.buttonCancel]}
+                onPress={onCancel}>
+                <Text style={styles.textStyle}>Cancel</Text>
+              </Pressable>
+            </View>
+
           </View>
 
         </View>
@@ -96,6 +119,11 @@ const AddRunTime = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
+
+  submitCancel: {
+    flexDirection: 'row',
+    alignItems: 'center',    
+  },
 
   weekDaysContainer: {
     flexDirection: 'row',
@@ -149,10 +177,10 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation: 2,
   },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
+  buttonCancel: {
+    backgroundColor: 'red',
   },
-  buttonClose: {
+  buttonSubmit: {
     backgroundColor: '#2196F3',
   },
   textStyle: {
@@ -160,10 +188,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
+
   modal: {
 
   }

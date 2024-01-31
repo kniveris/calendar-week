@@ -23,20 +23,66 @@ const exampleEvents: EventItem[] = [
 
 const Calendar = () => {
 
-  const [runTimeIsVisible, setRunTimeVisible] = useState(false);
+//shows if modal to add event is visible
+  const [addTimeMenuIsVisible, setTimeMenuVisible] = useState(false);
 
+//tracks which days are selected for event
+  const [selectedDays, setSelectedDays] = useState([]);
 
-  const addEvent = () => {
-    setRunTimeVisible(!runTimeIsVisible)
-    console.log(runTimeIsVisible)
-
+  const closeEvent = () => {
+    setTimeMenuVisible(!addTimeMenuIsVisible)
+    setSelectedDays([]); // Set selectedDays to an empty array
+    setStartTime(new Date()); // Reset startTime to the original value
+    setEndTime(new Date()); // Reset endTime to the original value
 
   };
 
+
+
+  const [events, setEvents] = useState(exampleEvents);
+  const addNewEvent = (newEvent) => {
+    setEvents((prevEvents) => [...prevEvents, newEvent]);
+  };
+
+  const addEvent = () => {
+    // setTimeMenuVisible(!addTimeMenuIsVisible)
+
+    // console.log(selectedDays)
+    const hours = startTime.getHours();
+    const minutes = startTime.getMinutes();
+    console.log(`Start Time: '${hours}':${minutes}`);
+    console.log(`2024-01-20T${hours}:${minutes}:00.000Z`)
+
+    const newEvent = {
+      id: events.length+1,
+      start: `2024-01-20T${hours}:${minutes}:00.000Z`, 
+      end: '2024-01-21T06:00:00.000Z',   
+      color: '#FFD700', // Replace with your desired color
+    };
+
+    addNewEvent(newEvent);
+
+    closeEvent();
+
+    // console.log(events);
+  };
+
+
+  //time that is chosen
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
+
+
+
+//doesnt run without this
   useEffect(() => {
     // You can perform any additional logic if needed
-  }, [runTimeIsVisible]);
+  }, [addTimeMenuIsVisible]);
 
+
+  const openEventModal = () => {
+    setTimeMenuVisible(!addTimeMenuIsVisible)
+  }
 
 
   return (
@@ -49,7 +95,7 @@ const Calendar = () => {
         // renderDayBarItem=''
         allowPinchToZoom
         // allowDragToCreate={true}
-        events={exampleEvents}
+        events={events}
          />
 
        
@@ -64,12 +110,19 @@ const Calendar = () => {
        // raised={true}
        // type="outline"
         style={styles.addButton}
-        onPress={addEvent}
+        onPress={openEventModal}
       />  
        
       <AddRunTime
-        visible={runTimeIsVisible}
-        onClose={addEvent}
+        visible={addTimeMenuIsVisible}
+        onSubmit={addEvent}
+        onCancel={closeEvent}
+        selectedDays={selectedDays}
+        setSelectedDays={setSelectedDays}
+        startTime={startTime}
+        endTime={endTime}
+        setStartTime={setStartTime}
+        setEndTime={setEndTime}
        />
 
 
