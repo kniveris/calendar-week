@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import {  Modal, StyleSheet, Text, Pressable, View, TextInput} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import GraySeparator from './GraySeparator';
+import OptionsMenuLine from './OptionsMenuLine';
 
-const AddRunTime = ({ visible, onSubmit, onCancel, selectedDays, setSelectedDays, startTime, endTime, setStartTime, setEndTime }) => {
+const AddRunTime = ({ 
+  visible,
+  onSubmit, 
+  onCancel, 
+  selectedDays, 
+  setSelectedDays, 
+  startTime, 
+  endTime, 
+  setStartTime, 
+  setEndTime }) => {
   // const [startTime, onChangeNumber] = React.useState('');
 
   // const [selectedDays, setSelectedDays] = useState([]);
@@ -46,6 +57,17 @@ const AddRunTime = ({ visible, onSubmit, onCancel, selectedDays, setSelectedDays
     }
   };
 
+
+  const timePicker = (value, timeType) => (
+    <DateTimePicker
+      value={value}
+      mode='time'
+      onChange={(event, selectedTime) => onTimeChange(event, selectedTime, timeType)}
+      style={styles.timePicker}
+      minuteInterval={5}
+    />
+  );
+
   return (
       <Modal
         animationType="slide"
@@ -62,7 +84,7 @@ const AddRunTime = ({ visible, onSubmit, onCancel, selectedDays, setSelectedDays
                   key={index}
                   onPress={() => dayPressed(index)}
                   style={({ pressed }) => [
-                    styles.button,
+                    styles.pressableDays,
                     {
                     backgroundColor: selectedDays.includes(index) ? 'lightgray' : 'white',
                     },
@@ -72,35 +94,30 @@ const AddRunTime = ({ visible, onSubmit, onCancel, selectedDays, setSelectedDays
                 </Pressable>
               ))}
             </View>
-            <View style={styles.startTime}>
-              <Text>Start Time: </Text>
-              <DateTimePicker
-                value={startTime}
-                mode='time'
-                // display='spinner'
-                onChange={(event, selectedTime) => onTimeChange(event, selectedTime, 'start')}
-                style={styles.timePicker}
-                minuteInterval={5}
+
+            <GraySeparator />
+
+            <OptionsMenuLine
+              text={'Start Time:'}
+              item={timePicker(startTime, 'start')}
+              key="startTimePicker" 
               />
 
-            </View>
-            <View style={styles.endTime}>
-              <Text>End Time: </Text>
-              <DateTimePicker
-                value={endTime}
-                mode='time'
-                // display='spinner'
-                onChange={(event, selectedTime) => onTimeChange(event, selectedTime, 'end')}
-                style={styles.timePicker}
-                minuteInterval={5}
-
+            <GraySeparator />
+            <OptionsMenuLine
+              text={'End Time:'}
+              item={timePicker(endTime, 'end')}
+              key="endTimePicker" 
               />
-            </View>
+
+            <GraySeparator />
+
+
             <View style={styles.submitCancel}>
               <Pressable
                 style={[styles.button, styles.buttonSubmit]}
                 onPress={onSubmit}>
-                <Text style={styles.textStyle}>Set Time</Text>
+                <Text style={styles.textStyle}>Save</Text>
               </Pressable>
               <Pressable
                 style={[styles.button, styles.buttonCancel]}
@@ -108,6 +125,7 @@ const AddRunTime = ({ visible, onSubmit, onCancel, selectedDays, setSelectedDays
                 <Text style={styles.textStyle}>Cancel</Text>
               </Pressable>
             </View>
+
 
           </View>
 
@@ -120,31 +138,37 @@ const AddRunTime = ({ visible, onSubmit, onCancel, selectedDays, setSelectedDays
 
 const styles = StyleSheet.create({
 
+  pressableDays: {
+    borderRadius: 20,
+    padding: 10,
+    margin: 2,
+  },
+
   submitCancel: {
+    width: '50%',
     flexDirection: 'row',
-    alignItems: 'center',    
+    alignItems: 'center', 
+    justifyContent: 'space-between', // Add this line
+    marginBottom: 50,
+    marginTop: 20,
+
+
   },
 
   weekDaysContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between', // Add this line
+    marginTop: 15,
 
-  },
 
-  endTime: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 20,
+
   },
 
   timePicker: {
-    width:'50%',
-  },
+    // width:'100%',
+    alignSelf: 'flex-end',
 
-  startTime: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 20,
   },
 
   centeredView: {
@@ -157,11 +181,9 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: '100%',
-
     margin: 0,
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
